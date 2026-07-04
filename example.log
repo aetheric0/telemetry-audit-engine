@@ -1,0 +1,3 @@
+INFO:__main__:So should this
+WARNING:__main__:And this too
+ERROR:__main__:And non-ASCII stuff, too, like  Øresund and Malmö

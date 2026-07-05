@@ -1,6 +1,9 @@
 import asyncio
+import logging
 from app.schemas.telemetry import PayloadTelemetry
 from fastapi import APIRouter, status
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 

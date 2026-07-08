@@ -1,5 +1,6 @@
 import logging
 import chromadb
+from chromadb.api import ClientAPI
 from fastapi import FastAPI, Request
 from .config import settings
 from contextlib import asynccontextmanager
@@ -24,7 +25,7 @@ async def db_lifespan(app: FastAPI):
 
     logger.info("Securely flushing memory buffers and closing database.")
 
-def get_chroma_db(request: Request) -> chromadb.PersistentClient:
+def get_chroma_db(request: Request) -> ClientAPI:
     """Injects the running client instance into endpoint operations."""
     return request.app.state.chroma_client
     

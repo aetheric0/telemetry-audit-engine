@@ -9,3 +9,6 @@ htmlcov
 
 #Local DB Store
 .persistent_storage/
+
+# Logs
+logs.py

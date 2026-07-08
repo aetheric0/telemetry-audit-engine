@@ -14,5 +14,9 @@ wheels/
 
 # Local DB Store
 .persistent_storage/
+.chroma_storage/
+
+# Logs
+logs.log
 
 

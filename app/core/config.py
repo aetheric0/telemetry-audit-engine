@@ -1,4 +1,5 @@
 
+from pathlib import Path
 from typing import Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -16,13 +17,16 @@ class Settings(BaseSettings):
     PROJECT_NAME: str| None = None
 
     # ChromaDB persistence path
-    CHROMA_PERSIST_DIR: str | None = None
+    CHROMA_PERSIST_DIR: str | Path = ""
 
     # Static API key for node authentication
     API_KEY: str | None = None
 
     # LLM Provider Config
-    LLM_API_KEY: list[str] | None = None
+    LLM_API_KEYS: list[str] | None = None
+
+    # Logging Config
+    LOG_FILE: str
 
 
 settings = Settings()

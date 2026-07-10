@@ -1,4 +1,4 @@
-import chromadb
+from chromadb.api import ClientAPI
 import logging
 from typing import Any
 from fastapi import APIRouter, status, Depends
@@ -14,7 +14,7 @@ def get_active_nodes() -> dict[str, Any]:
     return {"message": "You have reached the nodes endpoint", "status_code": status.HTTP_200_OK}
 
 @router.post("/nodes/{node_id}/ingest", response_model=IngestResponse)
-def log_data(node_id: str, payload: TelemetryPayload, db: chromadb.PersistentClient = Depends(get_chroma_db)) -> IngestResponse:
+def log_data(node_id: str, payload: TelemetryPayload, db: ClientAPI = Depends(get_chroma_db)) -> IngestResponse:
     # Fast: Grabs the collection instantly because it was guaranteed at server boot
     collection = db.get_collection(name="industrial_telemetry_store")
 

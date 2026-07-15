@@ -1,3 +1,5 @@
+from typing import List
+
 from chromadb import Collection
 from app.schemas.query import TelemetrySearchRequest, TelemetrySearchMatch, TelemetrySearchResponse
 
@@ -17,24 +19,39 @@ class TelemetryRepository:
         )
 
         # Unpack ChromaDB's highly nested array matrix structure safely
-        formatted_matches = []
+        formatted_matches: List[TelemetrySearchMatch] = []
+
+        ids_batch = raw_results.get("ids")
+        documents_batch = raw_results.get("documents")
+        distances_batch = raw_results.get("distances")
+        metadatas_batch = raw_results.get("metadatas")
 
         # Verify if any results were returned to avoid IndexError
-        if raw_results and raw_results["ids"] and len(raw_results["ids"][0]) > 0:
-            documents = raw_results["documents"][0]
-            distances = raw_results["distances"][0]
-            metadatas = raw_results["metadatas"][0]
+        if (
+            ids_batch 
+            and documents_batch is not None
+            and distances_batch is not None
+            and metadatas_batch is not None
+        ):
+            ids = ids_batch[0]
+            documents = documents_batch[0]
+            distances = distances_batch[0]
+            metadatas = metadatas_batch[0]
 
             for i in range(len(ids)):
+                doc_text = str(documents[i])
+                dist_val = float(distances[i])
+                meta_dict = metadatas[i]
+
                 match_item = TelemetrySearchMatch(
-                    id=ids[1],
-                    document=documents[i]
-                    distance=round(distances[i], 4)     #clean floating-point precision
-                    metadata=metadatas[i] if metadatas[i] else {}
+                    id=ids[i],
+                    document=doc_text,
+                    distance=round(dist_val, 4),     #clean floating-point precision
+                    metadata= dict(meta_dict)
                 )
                 formatted_matches.append(match_item)
     
-    return TelemetrySearchResponse(
-        query = search_params.query_text,
-        matches=formatted_matches
-    )
+        return TelemetrySearchResponse(
+            query = search_params.query_text,
+            matches=formatted_matches
+        )

@@ -1,4 +1,3 @@
-import threading
 from typing import List
 
 from chromadb import Collection, Metadata
@@ -6,14 +5,12 @@ from app.schemas.query import TelemetrySearchRequest, TelemetrySearchMatch, Tele
 
 # Module-level lock for all ChromaDB write operations
 
-_write_lock = threading.Lock()
-
 class TelemetryRepository:
     def __init__(self, collection: Collection):
         self.collection = collection
 
-    def store_with_lock(self, ids: List[str], documents: List[str], metadatas: List[Metadata] | None):
-        """ Thread-safe upsert with lock.
+    def store_without_lock(self, ids: List[str], documents: List[str], metadatas: List[Metadata] | None):
+        """ Thread-unsafe upsert without lock.
         """
         self.collection.upsert(
             ids=ids,

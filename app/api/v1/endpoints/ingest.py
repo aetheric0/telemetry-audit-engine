@@ -26,7 +26,7 @@ def store_telemetry(db: ClientAPI, node_id: str, payload: TelemetryPayload):
         "status_code": str(payload.status_code),
         "structured_metrics.json": json.dumps(payload.structured_metrics)
     }
-    telemetry_repo.store_with_lock(
+    telemetry_repo.store_without_lock(
         ids=[f"{node_id}_{payload.timestamp.timestamp()}"],
         documents=[payload.data_summary],
         metadatas=[flat_metadata],

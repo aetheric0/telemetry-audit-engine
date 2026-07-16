@@ -15,11 +15,12 @@ class TelemetryRepository:
     def store_with_lock(self, ids: List[str], documents: List[str], metadatas: List[Metadata] | None):
         """ Thread-safe upsert with lock.
         """
-        self.collection.upsert(
-            ids=ids,
-            documents=documents,
-            metadatas=metadatas
-        )
+        with _write_lock:
+            self.collection.upsert(
+                ids=ids,
+                documents=documents,
+                metadatas=metadatas
+            )
     
     def semantic_search(self, search_params: TelemetrySearchRequest) -> TelemetrySearchResponse:
         """

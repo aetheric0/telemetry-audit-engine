@@ -6,5 +6,7 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "fastapi[standard]>=0.138.2",
+    "chromadb",
+    "groq",
 ]
 entrypoint = "app.main:app"

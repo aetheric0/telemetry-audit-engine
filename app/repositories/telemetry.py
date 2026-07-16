@@ -7,7 +7,7 @@ class TelemetryRepository:
     def __init__(self, collection: Collection):
         self.collection = collection
     
-    def semantic_search(self, search_params: TelemetrySearchRequest):
+    def semantic_search(self, search_params: TelemetrySearchRequest) -> TelemetrySearchResponse:
         """
         Executes a localized semantic distance lookup across the vector store.
         Uses standard def because local file-backed HNSW lookups are blocking.
@@ -41,13 +41,13 @@ class TelemetryRepository:
             for i in range(len(ids)):
                 doc_text = str(documents[i])
                 dist_val = float(distances[i])
-                meta_dict = metadatas[i]
+                meta_dict = dict(metadatas[i])
 
                 match_item = TelemetrySearchMatch(
                     id=ids[i],
                     document=doc_text,
                     distance=round(dist_val, 4),     #clean floating-point precision
-                    metadata= dict(meta_dict)
+                    metadata= meta_dict
                 )
                 formatted_matches.append(match_item)
     

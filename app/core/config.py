@@ -25,8 +25,10 @@ class Settings(BaseSettings):
     # LLM Provider Config
     LLM_API_KEYS: list[str] | None = None
 
+    GROQ_API_KEY: str | None = None
+
     # Logging Config
-    LOG_FILE: str
+    LOG_FILE: str | None = None
 
 
 settings = Settings()

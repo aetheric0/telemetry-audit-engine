@@ -6,7 +6,7 @@ from app.core.deps import get_chroma_db
 
 router = APIRouter()
 
-@router.get('/query', response_model=TelemetrySearchResponse)
+@router.post('/query', response_model=TelemetrySearchResponse)
 def query_db(search_params: TelemetrySearchRequest,db: ClientAPI = Depends(get_chroma_db)) -> TelemetrySearchResponse:
     """
     Exposes a natural language semantic search endpoint over historical asset telemetry.

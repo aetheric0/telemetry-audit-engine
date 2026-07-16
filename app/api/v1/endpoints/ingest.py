@@ -1,5 +1,6 @@
 from chromadb.api import ClientAPI
 import logging
+import itertools
 from typing import Any
 from fastapi import APIRouter, status, Depends, BackgroundTasks
 from app.core.deps import get_chroma_db
@@ -7,6 +8,7 @@ from app.repositories.telemetry import TelemetryRepository
 from app.schemas.telemetry import TelemetryPayload
 from app.schemas.ingest import IngestResponse
 
+request_counter = itertools.count(start=1)
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
@@ -45,6 +47,7 @@ def log_data(
     background_tasks: BackgroundTasks,
     db: ClientAPI = Depends(get_chroma_db)
 ) -> IngestResponse:
+    count = next(request_counter)
     # Validate the node_id in URL matches body (if present)
     if payload.node_id != node_id:
         from fastapi import HTTPException
@@ -58,6 +61,6 @@ def log_data(
         status_code= status.HTTP_202_ACCEPTED,
         node_id=node_id,
         processed_records=f"1 record processed for node {node_id} at {payload.timestamp.isoformat()}",
-        message="Telemetry packet committed cleanly to disk storage."
+        message=f"{count} Telemetry packet committed cleanly to disk storage."
     )
     

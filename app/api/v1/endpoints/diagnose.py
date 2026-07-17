@@ -1,15 +1,16 @@
 from typing import List
-
-from app.services.llm_service import LLMService
-#from app.services.rag_service import RAGService
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
+from chromadb.api import ClientAPI
+
+from app.core.deps import get_chroma_db
 from app.schemas.query import TelemetrySearchRequest, TelemetrySearchResponse, TelemetrySearchMatch
 #from app.schemas.diagnostics import DiagnosticResponse
 from app.repositories.telemetry import TelemetryRepository
-from chromadb.api import ClientAPI
-from app.core.deps import get_chroma_db
 from app.services.custom_prompt import build_diagnostic_prompt
+from app.services.llm_service import LLMService
+#from app.services.rag_service import RAGService
+
 
 router = APIRouter()
 

@@ -3,6 +3,7 @@ import chromadb
 from chromadb.api import ClientAPI
 from fastapi import FastAPI, Request
 from .config import settings
+from .seed import seed_database
 from contextlib import asynccontextmanager
 
 
@@ -17,6 +18,8 @@ async def db_lifespan(app: FastAPI):
     
     # Pre-boot the collection here once so routes never run redundant lookup checks.
     chroma_client.get_or_create_collection(name="industrial_telemetry_store")
+
+    seed_database(chroma_client)
 
     # Store the client reference inside the application state
     app.state.chroma_client = chroma_client

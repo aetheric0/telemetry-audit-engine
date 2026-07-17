@@ -69,4 +69,20 @@ Watch the 2‑minute walkthrough
 - Data sovereignty – runs on your hardware.
 - Auditable – every diagnosis is traceable to exact log sources.
 
+## Data Lifecycle
+
+- **Hot retention (ChromaDB):** all error records + rolling 30‑day window of routine telemetry. Pruning script included (`scripts/prune_chroma.py`).
+- **Pruning:** Admin endpoint `POST /admin/prune?days_to_keep=30` deletes logs older than N days, keeping the vector store lean.
+    - **TODO: Protect with admin API key or internal-only network access in production.**
+- **Future work:** Integrate with a time‑series database (InfluxDB) for long‑term metrics storage, with automatic archive to object storage for compliance.
+
+## Roadmap / Production Vision
+
+- **Live streaming ingestion** via MQTT/WebSocket, with batching and back‑pressure control.
+- **Time‑series storage** for raw metrics (InfluxDB/TimescaleDB) to complement the semantic log store.
+- **Anomaly detection pipeline** that automatically creates diagnostic logs in ChromaDB when thresholds are breached.
+- **Hybrid search** (keyword + vector) for even better retrieval accuracy.
+
+
+
 ### License

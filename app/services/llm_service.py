@@ -28,7 +28,8 @@ class LLMService:
             stream=True,
         )
         async for chunk in stream:
-            if chunk.choices[0].delta.content:
-                yield chunk.choices[0].delta.content
+            token = chunk.choices[0].delta.content
+            if token:
+                yield token
                 if demo_mode:
                     await asyncio.sleep(0.05)

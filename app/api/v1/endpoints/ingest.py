@@ -22,9 +22,10 @@ def store_telemetry(db: ClientAPI, node_id: str, payload: TelemetryPayload):
     collection = db.get_collection(name="industrial_telemetry_store")
     telemetry_repo = TelemetryRepository(collection)
 
-    flat_metadata = {
+    flat_metadata: dict[str, str | float] = {
         "node_id": node_id,
         "timestamp": payload.timestamp.isoformat(),
+        "timestamp_epoch": payload.timestamp.timestamp(),
         "metric_type": payload.metric_type,
         "status_code": str(payload.status_code),
         "structured_metrics.json": json.dumps(payload.structured_metrics)

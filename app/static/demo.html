@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Streaming Diagnostic Demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 1rem; }
+    #response { white-space: pre-wrap; background: #f4f4f4; padding: 1rem; border-radius: 8px; min-height: 200px; }
+    #response h1, #response h2, #response h3 {
+        margin-top: 0.5em;
+        margin-bottom: 0.2em;
+    }
+    #response p {
+        margin-top: 0.2em;
+        margin-bottom: 0.2em;
+    }
+    #response ul, #response ol {
+        margin-top: 0.2em;
+        margin-bottom: 0.2em;
+    }
+    #response li {
+     margin-bottom: 0.1em;
+    }
+    textarea { width: 100%; padding: 0.5rem; }
+    button { margin-top: 0.5rem; padding: 0.5rem 1rem; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>Industrial Telemetry AI Auditor – Demo</h2>
+    <p>
+    This demo uses sample power‑systems telemetry. The same engine works for any industry:
+    manufacturing, fintech, logistics — just swap the data. Try the query below or write your own.
+    </p>
+  <label for="query">Describe the issue:</label><br>
+  <textarea id="query" rows="2" placeholder="e.g., Is there a node with current between 15 and 25 Amperes?">Is there a node with current between 15 and 25 Amperes?</textarea><br>
+  <button onclick="streamDiagnosis()">Diagnose (Streaming)</button>
+  <h3>Diagnosis</h3>
+  <div id="response"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+    async function streamDiagnosis() {
+        const query = document.getElementById('query').value;
+        const responseDiv = document.getElementById('response');
+        responseDiv.textContent = '';   // clear
+
+        const response = await fetch('/api/v1/diagnose', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'text/plain' },
+        body: JSON.stringify({ query_text: query, n_results: 5 })
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let rawText = '';
+
+        // 1) Stream tokens as plain text (fast, non‑blocking UI)
+        while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        rawText += chunk;
+        responseDiv.textContent = rawText;   // update immediately (no formatting yet)
+        }
+
+        // 2) After stream ends, convert Markdown to HTML and render
+        const html = marked.parse(rawText);
+        responseDiv.innerHTML = html;
+    }
+    </script>
+</body>
+</html>

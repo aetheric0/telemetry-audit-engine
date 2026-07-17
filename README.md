@@ -31,7 +31,7 @@ All on a **$5/month VPS** with **zero cloud vendor lock‑in** – your data sta
 |----------|-----------|
 | **Embedded ChromaDB over client‑server** | Zero operational overhead, keeps the entire system in one process for easy deployment. |
 | **Thread‑lock on writes** | Empirically tested: without it, concurrent writes exhaust the thread pool under load (see `tests/stress_test.py`). The lock ensures graceful degradation, not timeout failures. |
-| **Streaming response** | Users see diagnosis in real time; demonstrates async I/O mastery. |
+| **Streaming response** | Users see diagnosis in real time |
 | **No heavy framework** | Deliberately avoided LangChain/LlamaIndex to keep the pipeline transparent and debuggable. |
 | **JSON‑serialized metrics in metadata** | Preserves rich structured data for LLM context without breaking ChromaDB’s flat metadata constraint. |
 

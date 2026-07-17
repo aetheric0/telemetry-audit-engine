@@ -1,4 +1,4 @@
-# Industrial Telemetry AI Auditor
+# Auditron - Telemetry Analytics Engine
 
 **Reduce incident diagnosis from hours to seconds with on‑prem, cost‑efficient AI.**
 

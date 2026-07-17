@@ -2,71 +2,281 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Streaming Diagnostic Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auditron - Your Agentic Log Auditor</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 1rem; }
-    #response { white-space: pre-wrap; background: #f4f4f4; padding: 1rem; border-radius: 8px; min-height: 200px; }
+    :root {
+      --bg-main: #09090b;
+      --bg-card: #18181b;
+      --bg-terminal: #030712;
+      --border-color: #27272a;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent: #10b981; /* Emerald operational green */
+      --accent-glow: rgba(16, 185, 129, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      line-height: 1.6;
+    }
+
+    /* System Status Bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-family: monospace;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Main Container */
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Form Controls */
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    textarea {
+      width: 100%;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-main);
+      padding: 0.75rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    button {
+      background-color: var(--text-main);
+      color: var(--bg-main);
+      border: none;
+      border-radius: 6px;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, opacity 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button:hover {
+      background-color: #ffffff;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Terminal Diagnostics Window */
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      padding: 0.5rem 1rem;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      margin-top: 2rem;
+    }
+
+    .terminal-title {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    #response {
+      white-space: pre-wrap;
+      background-color: var(--bg-terminal);
+      border: 1px solid var(--border-color);
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      padding: 1.25rem;
+      min-height: 250px;
+      font-size: 0.95rem;
+      color: #e4e4e7;
+    }
+
+    /* Rendered Markdown Styling Alignment */
+    #response.rendered {
+      white-space: normal;
+    }
     #response h1, #response h2, #response h3 {
-        margin-top: 0.5em;
-        margin-bottom: 0.2em;
+      color: var(--text-main);
+      margin: 1rem 0 0.5rem 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.01em;
     }
-    #response p {
-        margin-top: 0.2em;
-        margin-bottom: 0.2em;
-    }
-    #response ul, #response ol {
-        margin-top: 0.2em;
-        margin-bottom: 0.2em;
-    }
-    #response li {
-     margin-bottom: 0.1em;
-    }
-    textarea { width: 100%; padding: 0.5rem; }
-    button { margin-top: 0.5rem; padding: 0.5rem 1rem; cursor: pointer; }
+    #response h1:first-child, #response h2:first-child, #response h3:first-child { margin-top: 0; }
+    #response p { margin-bottom: 0.75rem; color: #d4d4d8; }
+    #response ul, #response ol { margin-left: 1.25rem; margin-bottom: 0.75rem; color: #d4d4d8; }
+    #response li { margin-bottom: 0.25rem; }
+    #response code { font-family: monospace; background: #27272a; padding: 0.15rem 0.3rem; border-radius: 4px; font-size: 0.85rem; color: #f4f4f5; }
   </style>
 </head>
 <body>
-  <h2>Industrial Telemetry AI Auditor – Demo</h2>
+
+  <div class="status-bar">
+    <div class="status-indicator">
+      <div class="pulse-dot"></div>
+      Engine Status: Operational
+    </div>
+    <div class="status-indicator" style="font-size: 0.75rem;">
+      Node: Air-Gapped / Local
+    </div>
+  </div>
+
+  <header>
+    <h1>Telemetry Analytics Engine</h1>
     <p>
-    This demo uses sample power‑systems telemetry. The same engine works for any industry:
-    manufacturing, fintech, logistics — just swap the data. Try the query below or write your own.
+      Cross-referencing real-time telemetry datasets against historical log cycles using a streaming semantic evaluation loop. Optimized for sub-millisecond local contextual retrieval.
     </p>
-  <label for="query">Describe the issue:</label><br>
-  <textarea id="query" rows="2" placeholder="e.g., Is there a node with current between 15 and 25 Amperes?">Is there a node with current between 15 and 25 Amperes?</textarea><br>
-  <button onclick="streamDiagnosis()">Diagnose (Streaming)</button>
-  <h3>Diagnosis</h3>
-  <div id="response"></div>
+     <p>
+      <b>NOTE</b>: This demo uses sample power-systems telemetry. The same engine works for any industry:
+      manufacturing, fintech, logistics -- just swap the data. Try the query below or write your own.
+    </p>
+  </header>
+
+  <main>
+    <div class="control-group">
+      <label for="query">Target Analytical Query</label>
+      <textarea id="query" rows="3" placeholder="e.g., Is there a node with current between 15 and 25 Amperes?">Is there a node with current between 15 and 25 Amperes?</textarea>
+    </div>
+
+    <button id="diagnoseBtn" onclick="streamDiagnosis()">
+      Execute Audit Stream
+    </button>
+
+    <div class="terminal-header">
+      <div class="terminal-title">Console Output // Stream Analytics</div>
+    </div>
+    <div id="response"></div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script>
+  <script>
     async function streamDiagnosis() {
         const query = document.getElementById('query').value;
         const responseDiv = document.getElementById('response');
-        responseDiv.textContent = '';   // clear
+        const btn = document.getElementById('diagnoseBtn');
+        
+        // Setup initial UI active states
+        responseDiv.classList.remove('rendered');
+        responseDiv.textContent = 'Initializing vector lookup context...\n';
+        btn.disabled = true;
 
-        const response = await fetch('/api/v1/diagnose', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'text/plain' },
-        body: JSON.stringify({ query_text: query, n_results: 5 })
-        });
+        try {
+            const response = await fetch('/api/v1/diagnose', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'text/plain' },
+                body: JSON.stringify({ query_text: query, n_results: 5 })
+            });
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let rawText = '';
+            if (!response.body) {
+                responseDiv.textContent = 'Error: No readable response stream returned from node endpoint.';
+                btn.disabled = false;
+                return;
+            }
 
-        // 1) Stream tokens as plain text (fast, non‑blocking UI)
-        while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        rawText += chunk;
-        responseDiv.textContent = rawText;   // update immediately (no formatting yet)
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let rawText = '';
+            responseDiv.textContent = ''; // clear the init log
+
+            // 1) Stream tokens as plain text (preserving linebreaks directly)
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+                rawText += chunk;
+                responseDiv.textContent = rawText; 
+            }
+
+            // 2) Parse to markdown cleanly once the channel closes
+            responseDiv.classList.add('rendered');
+            responseDiv.innerHTML = marked.parse(rawText);
+
+        } catch (error) {
+            responseDiv.textContent = `System Exception: Failed to execute fetch against local node loop.\nDetails: ${error.message}`;
+        } finally {
+            btn.disabled = false;
         }
-
-        // 2) After stream ends, convert Markdown to HTML and render
-        const html = marked.parse(rawText);
-        responseDiv.innerHTML = html;
     }
-    </script>
+  </script>
 </body>
 </html>

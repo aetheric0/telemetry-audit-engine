@@ -71,7 +71,7 @@ Watch the 2‑minute walkthrough
 
 ## Data Lifecycle
 
-- **Hot retention (ChromaDB):** all error records + rolling 30‑day window of routine telemetry. Pruning script included (`scripts/prune_chroma.py`).
+- **Hot retention (ChromaDB):** all error records + rolling 30‑day window of routine telemetry. Pruning endpoint included (`/api/v1/endpoints/prune_chroma.py`).
 - **Pruning:** Admin endpoint `POST /admin/prune?days_to_keep=30` deletes logs older than N days, keeping the vector store lean.
     - **TODO: Protect with admin API key or internal-only network access in production.**
 - **Future work:** Integrate with a time‑series database (InfluxDB) for long‑term metrics storage, with automatic archive to object storage for compliance.

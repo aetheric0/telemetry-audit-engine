@@ -2,8 +2,8 @@
 
 **Reduce incident diagnosis from hours to seconds with on‑prem, cost‑efficient AI.**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-API-green)]([your-live-url])
-[![Watch the video](https://img.shields.io/badge/Watch-Demo%20Video-blue)]([your-video-url])
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-API-green)](https://telemetry-audit-engine.onrender.com)
+[![Watch the video](https://img.shields.io/badge/Watch-Demo%20Video-blue)]([video-url])
 
 ## The Problem
 

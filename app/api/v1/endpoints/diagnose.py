@@ -30,8 +30,14 @@ def diagnose(search_params: TelemetrySearchRequest, db: ClientAPI = Depends(get_
         async for token in llm.generate_stream(prompt, demo_mode=True):
             yield token
 
+    async def sse_generator():
+        async for token in token_generator():
+            # Each token becomes an SSE event: "data: <token>\n\n"
+            yield f"data: {token}\n\n"
+        yield "data: [DONE]\n\n"
+
     return StreamingResponse(
-        token_generator(),
+        sse_generator(),
         media_type="text/plain",
         headers={
             "X-Accel-Buffering": "no",

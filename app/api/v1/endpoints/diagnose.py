@@ -32,7 +32,11 @@ def diagnose(search_params: TelemetrySearchRequest, db: ClientAPI = Depends(get_
 
     return StreamingResponse(
         token_generator(),
-        media_type="text/plain"
+        media_type="text/plain",
+        headers={
+            "X-Accel-Buffering": "no",
+            "Cache-Control": "no-cache"
+        }
     )
     
 

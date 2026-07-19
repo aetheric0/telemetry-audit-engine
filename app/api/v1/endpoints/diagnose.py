@@ -5,25 +5,19 @@ from chromadb.api import ClientAPI
 
 from app.core.deps import get_chroma_db
 from app.schemas.query import TelemetrySearchRequest, TelemetrySearchResponse, TelemetrySearchMatch
-#from app.schemas.diagnostics import DiagnosticResponse
 from app.repositories.telemetry import TelemetryRepository
 from app.services.custom_prompt import build_diagnostic_prompt
 from app.services.llm_service import LLMService
-#from app.services.rag_service import RAGService
-
 
 router = APIRouter()
 
 @router.post("/diagnose")
 def diagnose(search_params: TelemetrySearchRequest, db: ClientAPI = Depends(get_chroma_db)) -> StreamingResponse:
-    telemetry_repo = TelemetryRepository(collection = db.get_collection("industrial_telemetry_store"))
+    telemetry_repo = TelemetryRepository(collection=db.get_collection("industrial_telemetry_store"))
     search_response: TelemetrySearchResponse = telemetry_repo.semantic_search(search_params)
     query_matches: List[TelemetrySearchMatch] = search_response.matches
 
-    # Build prompt
     prompt = build_diagnostic_prompt(search_params.query_text, query_matches)
-
-    # Create LLM Service
     llm = LLMService()
 
     async def token_generator():
@@ -32,27 +26,14 @@ def diagnose(search_params: TelemetrySearchRequest, db: ClientAPI = Depends(get_
 
     async def sse_generator():
         async for token in token_generator():
-            # Each token becomes an SSE event: "data: <token>\n\n"
             yield f"data: {token}\n\n"
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(
         sse_generator(),
-        media_type="text/plain",
+        media_type="text/event-stream",   # <-- fixed
         headers={
             "X-Accel-Buffering": "no",
             "Cache-Control": "no-cache"
         }
     )
-    
-
-
-    
-    
-    # answer = llm.generate_response(prompt)
-
-    # return DiagnosticResponse(
-    #     query=search_params.query_text,
-    #     diagnosis=answer,
-    #     sources=[m.id for m in query_matches]
-    # )

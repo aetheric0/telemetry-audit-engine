@@ -205,64 +205,67 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-      async function streamDiagnosis() {
-      const query = document.getElementById('query').value;
-      const responseDiv = document.getElementById('response');
-      const btn = document.getElementById('diagnoseBtn');
-      
-      responseDiv.classList.remove('rendered');
-      responseDiv.textContent = '';
-      btn.disabled = true;
+    async function streamDiagnosis() {
+        const query = document.getElementById('query').value;
+        const responseDiv = document.getElementById('response');
+        const btn = document.getElementById('diagnoseBtn');
 
-      try {
-          const response = await fetch('/api/v1/diagnose', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Accept': 'text/event-stream'   // important: tell server we want SSE
-              },
-              body: JSON.stringify({ query_text: query, n_results: 5 })
-          });
+        // Show initializing message
+        responseDiv.classList.remove('rendered');
+        responseDiv.textContent = 'Initializing vector lookup context...\n';
+        btn.disabled = true;
 
-          if (!response.body) {
-              responseDiv.textContent = 'Error: No response stream.';
-              btn.disabled = false;
-              return;
-          }
+        try {
+            const response = await fetch('/api/v1/diagnose', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'text/event-stream'
+                },
+                body: JSON.stringify({ query_text: query, n_results: 5 })
+            });
 
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder();
-          let rawText = '';
+            if (!response.body) {
+                responseDiv.textContent = 'Error: No response stream.';
+                btn.disabled = false;
+                return;
+            }
 
-          while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              const chunk = decoder.decode(value, { stream: true });
-              
-              // Split by lines; SSE events are separated by double newlines
-              const lines = chunk.split('\n');
-              for (let line of lines) {
-                  if (line.startsWith('data: ')) {
-                      const token = line.substring(6);
-                      if (token === '[DONE]') continue;
-                      rawText += token;
-                      responseDiv.textContent = rawText;
-                      // force repaint
-                      await new Promise(resolve => setTimeout(resolve, 0));
-                  }
-              }
-          }
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let rawText = '';
 
-          // After stream ends, render markdown
-          responseDiv.classList.add('rendered');
-          responseDiv.innerHTML = marked.parse(rawText);
+            // Clear the initializing message before we start streaming tokens
+            responseDiv.textContent = '';
 
-      } catch (error) {
-          responseDiv.textContent = 'Error: ' + error.message;
-      } finally {
-          btn.disabled = false;
-      }
-  }
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+
+                const lines = chunk.split('\n');
+                for (let line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const token = line.substring(6);
+                        if (token === '[DONE]') continue;
+                        rawText += token;
+                        responseDiv.textContent = rawText;
+                        // Force browser repaint so streaming is visible
+                        await new Promise(resolve => setTimeout(resolve, 0));
+                    }
+                }
+            }
+
+            // After stream finishes, render Markdown -> HTML
+            responseDiv.classList.add('rendered');
+            responseDiv.innerHTML = marked.parse(rawText);
+
+        } catch (error) {
+            responseDiv.textContent = 'Error: ' + error.message;
+        } finally {
+            btn.disabled = false;
+        }
+    }
   </script>
 </body>
 </html>

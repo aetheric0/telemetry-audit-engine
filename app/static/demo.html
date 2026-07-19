@@ -210,7 +210,7 @@
         const responseDiv = document.getElementById('response');
         const btn = document.getElementById('diagnoseBtn');
 
-        // Show initializing message
+        // Setup initial visual states
         responseDiv.classList.remove('rendered');
         responseDiv.textContent = 'Initializing vector lookup context...\n';
         btn.disabled = true;
@@ -226,7 +226,7 @@
             });
 
             if (!response.body) {
-                responseDiv.textContent = 'Error: No response stream.';
+                responseDiv.textContent = 'System Error: No valid chunk stream detected from backend node.';
                 btn.disabled = false;
                 return;
             }
@@ -234,34 +234,47 @@
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let rawText = '';
+            let buffer = '';   
 
-            // Clear the initializing message before we start streaming tokens
-            responseDiv.textContent = '';
+            responseDiv.textContent = ''; // Flash clear once stream hits
 
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
-                const chunk = decoder.decode(value, { stream: true });
 
-                const lines = chunk.split('\n');
-                for (let line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const token = line.substring(6);
-                        if (token === '[DONE]') continue;
-                        rawText += token;
-                        responseDiv.textContent = rawText;
-                        // Force browser repaint so streaming is visible
-                        await new Promise(resolve => setTimeout(resolve, 0));
+                buffer += decoder.decode(value, { stream: true });
+
+                // Separate discrete chunks via clean double breaks
+                const events = buffer.split('\n\n');
+                buffer = events.pop(); // Maintain trailing fractional strings safely
+
+                for (const event of events) {
+                    const line = event.trim();
+                    if (!line || !line.startsWith('data: ')) continue;
+
+                    const dataPayload = line.substring(6).trim();
+                    if (dataPayload === '[DONE]') continue;
+
+                    try {
+                        // Parse out the safely structured token directly
+                        const parsed = JSON.parse(dataPayload);
+                        rawText += parsed.token;
+                    } catch (e) {
+                        // Secure fallback structural execution
+                        rawText += dataPayload;
                     }
+
+                    // Render live updates cleanly using monospaced line-break mapping
+                    responseDiv.textContent = rawText;
                 }
             }
 
-            // After stream finishes, render Markdown -> HTML
+            // Complete streaming termination sequence: Render beautiful rich Markdown
             responseDiv.classList.add('rendered');
             responseDiv.innerHTML = marked.parse(rawText);
 
         } catch (error) {
-            responseDiv.textContent = 'Error: ' + error.message;
+            responseDiv.textContent = 'System Exception: Execution failure -> ' + error.message;
         } finally {
             btn.disabled = false;
         }

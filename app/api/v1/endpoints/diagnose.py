@@ -25,10 +25,13 @@ def diagnose(search_params: TelemetrySearchRequest, db: ClientAPI = Depends(get_
             yield token
 
     async def sse_generator():
+        import json
         async for token in token_generator():
-            yield f"data: {token}\n\n"
+            # Standardize payload structure and safely escape formatting control characters
+            json_payload = json.dumps({"token": token})
+            yield f"data: {json_payload}\n\n"
         yield "data: [DONE]\n\n"
-
+        
     return StreamingResponse(
         sse_generator(),
         media_type="text/event-stream",   # <-- fixed

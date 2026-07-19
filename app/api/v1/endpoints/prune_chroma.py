@@ -11,7 +11,14 @@ def prune_old_logs(db: ClientAPI = Depends(get_chroma_db), days_to_keep: int = 3
     collection = db.get_collection(name="industrial_telemetry_store")
     cut_off_epoch = (datetime.now(timezone.utc) - timedelta(days=days_to_keep)).timestamp()
     before = collection.count()
-    collection.delete(where={"timestamp": {"$lt": cut_off_epoch}})
+    collection.delete(
+        where= {
+        "$and": [
+            {"timestamp": {"$lt": cut_off_epoch}}, 
+             {"status_code": 0}
+            ]
+        }
+    )
     after = collection.count()
     return {
         "message": f"Pruned records older than {days_to_keep} days",

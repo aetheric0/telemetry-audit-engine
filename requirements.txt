@@ -137,7 +137,7 @@ multidict==6.7.1
     # via
     #   aiohttp
     #   yarl
-numpy==2.5.1
+numpy==2.4.6
     # via
     #   chromadb
     #   onnxruntime

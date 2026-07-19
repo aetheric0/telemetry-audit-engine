@@ -21,7 +21,7 @@ def diagnose(search_params: TelemetrySearchRequest, db: ClientAPI = Depends(get_
     llm = LLMService()
 
     async def token_generator():
-        async for token in llm.generate_stream(prompt, demo_mode=True):
+        async for token in llm.generate_stream(prompt, demo_mode=False):
             yield token
 
     async def sse_generator():

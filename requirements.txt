@@ -61,7 +61,7 @@ email-validator==2.3.0
     # via
     #   fastapi
     #   pydantic
-fastapi==0.139.1
+fastapi[standard]==0.139.1
     # via app (pyproject.toml)
 fastapi-cli==0.0.32
     # via fastapi

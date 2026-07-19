@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auditron - Your Agentic Log Auditor</title>
+  <title>Auditron - Streaming Diagnostic Demo</title>
   <style>
     :root {
       --bg-main: #09090b;
@@ -12,12 +12,10 @@
       --border-color: #27272a;
       --text-main: #f4f4f5;
       --text-muted: #a1a1aa;
-      --accent: #10b981; /* Emerald operational green */
+      --accent: #10b981;
       --accent-glow: rgba(16, 185, 129, 0.15);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg-main);
@@ -27,8 +25,6 @@
       padding: 2rem 1.5rem;
       line-height: 1.6;
     }
-
-    /* System Status Bar */
     .status-bar {
       display: flex;
       align-items: center;
@@ -39,7 +35,6 @@
       border-radius: 8px;
       margin-bottom: 2rem;
     }
-
     .status-indicator {
       display: flex;
       align-items: center;
@@ -50,7 +45,6 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
-
     .pulse-dot {
       width: 8px;
       height: 8px;
@@ -59,35 +53,28 @@
       box-shadow: 0 0 0 0 var(--accent);
       animation: pulse 2s infinite;
     }
-
     @keyframes pulse {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
       70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
-
-    /* Main Container */
     header h1 {
       font-size: 1.75rem;
       font-weight: 700;
       letter-spacing: -0.02em;
       margin-bottom: 0.5rem;
     }
-
     header p {
       color: var(--text-muted);
       font-size: 0.95rem;
       margin-bottom: 2rem;
     }
-
-    /* Form Controls */
     .control-group {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
       margin-bottom: 1.5rem;
     }
-
     label {
       font-size: 0.85rem;
       font-weight: 600;
@@ -95,7 +82,6 @@
       letter-spacing: 0.05em;
       color: var(--text-muted);
     }
-
     textarea {
       width: 100%;
       background-color: var(--bg-card);
@@ -108,13 +94,11 @@
       resize: vertical;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-
     textarea:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
-
     button {
       background-color: var(--text-main);
       color: var(--bg-main);
@@ -129,17 +113,13 @@
       align-items: center;
       gap: 0.5rem;
     }
-
     button:hover {
       background-color: #ffffff;
     }
-
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-
-    /* Terminal Diagnostics Window */
     .terminal-header {
       display: flex;
       align-items: center;
@@ -152,14 +132,12 @@
       border-top-right-radius: 8px;
       margin-top: 2rem;
     }
-
     .terminal-title {
       font-family: monospace;
       font-size: 0.8rem;
       color: var(--text-muted);
       text-transform: uppercase;
     }
-
     #response {
       white-space: pre-wrap;
       background-color: var(--bg-terminal);
@@ -171,8 +149,6 @@
       font-size: 0.95rem;
       color: #e4e4e7;
     }
-
-    /* Rendered Markdown Styling Alignment */
     #response.rendered {
       white-space: normal;
     }
@@ -190,7 +166,6 @@
   </style>
 </head>
 <body>
-
   <div class="status-bar">
     <div class="status-indicator">
       <div class="pulse-dot"></div>
@@ -206,7 +181,7 @@
     <p>
       Cross-referencing real-time telemetry datasets against historical log cycles using a streaming semantic evaluation loop. Optimized for sub-millisecond local contextual retrieval.
     </p>
-     <p>
+    <p>
       <b>NOTE</b>: This demo uses sample power-systems telemetry. The same engine works for any industry:
       manufacturing, fintech, logistics -- just swap the data. Try the query below or write your own.
     </p>
@@ -235,7 +210,7 @@
         const responseDiv = document.getElementById('response');
         const btn = document.getElementById('diagnoseBtn');
         
-        // Setup initial UI active states
+        // Reset UI
         responseDiv.classList.remove('rendered');
         responseDiv.textContent = 'Initializing vector lookup context...\n';
         btn.disabled = true;
@@ -256,9 +231,9 @@
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let rawText = '';
-            responseDiv.textContent = ''; // clear the init log
+            responseDiv.textContent = ''; // clear the init message
 
-            // 1) Stream tokens as plain text (preserving linebreaks directly)
+            // 1) Stream tokens as plain text (preserving linebreaks)
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
@@ -267,7 +242,7 @@
                 responseDiv.textContent = rawText; 
             }
 
-            // 2) Parse to markdown cleanly once the channel closes
+            // 2) After stream ends, convert Markdown to HTML
             responseDiv.classList.add('rendered');
             responseDiv.innerHTML = marked.parse(rawText);
 

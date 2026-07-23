@@ -20,5 +20,5 @@ def build_diagnostic_prompt(query: str, matches: list[TelemetrySearchMatch]) -> 
         Relevant Historical Logs:
         {context}
 
-        If the issue contains a direct question about specific metrics (e.g., "Is there a node with current between X and Y?"), answer that question explicitly with a clear yes/no and cite the evidence. Then provide the root-cause analysis (if any) and recommended next steps.
+        If the issue contains a direct question about specific metrics, answer that question explicitly with a clear yes/no and cite the evidence. Then provide the root-cause analysis (if any) and recommended next steps.
     """

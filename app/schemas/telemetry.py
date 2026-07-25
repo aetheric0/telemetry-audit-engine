@@ -6,7 +6,7 @@ class TelemetryPayload(BaseModel):
     model_config = ConfigDict(extra="forbid")
     node_id: str = Field(
         ...,
-        description="Unique identifire for the edge node asset"
+        description="Unique identifier for the edge node asset"
     )
     timestamp: datetime = Field(
         default_factory=datetime.now,

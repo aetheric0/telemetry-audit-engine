@@ -31,6 +31,10 @@ def reset_collection(db: ClientAPI = Depends(get_chroma_db)):
     try:
         db.delete_collection("industrial_telemetry_store")
     except Exception as e:
-        raise Exception(f"Could not delete collection: {e}")
+        raise Exception(f"Could not delete collection, check if collection exists: {e}")
     # The lifespan or a subsequent call can re-create and seed
-    return {"message": "Collection deleted. Restart the app to re‑seed."}
+    # Recreate and re‑seed
+    from app.core.seed import seed_database
+    seed_database(db)  # This calls get_or_create_collection internally
+
+    return {"message": "Collection reset and re‑seeded successfully."}

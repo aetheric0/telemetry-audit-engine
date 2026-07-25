@@ -32,4 +32,4 @@ class LLMService:
             if token:
                 yield token
                 if demo_mode:
-                    await asyncio.sleep(0.05)
+                    await asyncio.sleep(0.01)

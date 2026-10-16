@@ -5,6 +5,8 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-API-green)](https://telemetry-audit-engine.onrender.com/demo)
 [![Watch the video](https://img.shields.io/badge/Watch-Demo%20Video-blue)](https://youtu.be/bkgv34DcSlQ?si=qYJSGw6tIhR-RPmv)
 
+![Auditron telemetry analytics engine preview](media/auditron.png)
+
 ## The Problem
 
 Industrial and infrastructure teams drown in telemetry logs. When a node fails, engineers manually grep through gigabytes of unstructured data to find root causes. This takes hours, delays repairs, and costs money.

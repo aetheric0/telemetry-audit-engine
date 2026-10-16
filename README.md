@@ -3,7 +3,7 @@
 **Reduce incident diagnosis from hours to seconds with on‑prem, cost‑efficient AI.**
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-API-green)](https://telemetry-audit-engine.onrender.com/demo)
-[![Watch the video](https://img.shields.io/badge/Watch-Demo%20Video-blue)]([video-url])
+[![Watch the video](https://img.shields.io/badge/Watch-Demo%20Video-blue)](https://youtu.be/bkgv34DcSlQ?si=qYJSGw6tIhR-RPmv)
 
 ## The Problem
 
@@ -61,7 +61,7 @@ uvicorn app.main:app --reload
 - POST /api/v1/diagnose – Natural language diagnostic query (streaming)
 
 ### Demo Video
-Watch the 2‑minute walkthrough
+Watch the 2‑minute walkthrough: https://youtu.be/bkgv34DcSlQ?si=qYJSGw6tIhR-RPmv
 
 ### Why This Matters to Your Business
 - Faster incident resolution – seconds, not hours.
